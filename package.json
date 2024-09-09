@@ -1,0 +1,27 @@
+{
+  "name": "fso_chapter-3_phonebook-backend",
+  "version": "1.0.0",
+  "description": "chapter-3-exercises",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awesomebunny2/FSO_Chapter-3_Phonebook-Backend.git"
+  },
+  "author": "Matt Calvert",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/awesomebunny2/FSO_Chapter-3_Phonebook-Backend/issues"
+  },
+  "homepage": "https://github.com/awesomebunny2/FSO_Chapter-3_Phonebook-Backend#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
