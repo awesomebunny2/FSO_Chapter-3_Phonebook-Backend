@@ -45,6 +45,18 @@ app.get("/info", (request, response) => {
     response.send(`<p>${length}<br/><br/>${time}.</p>`);
 });
 
+app.get("/api/persons/:id", (request, response) => {
+    const id = request.params.id;
+    const person = phonebook.find(entry => entry.id === id);
+
+    if (person) {
+        response.json(person);
+    } else {
+        response.statusMessage = `The person id of ${id} does not currently exist in the phonebook...`;
+        response.status(404).end();
+    };
+});
+
 
 
 
