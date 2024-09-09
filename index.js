@@ -63,6 +63,37 @@ app.delete("/api/persons/:id", (request, response) => {
     response.status(204).end();
 });
 
+const generateId = () => {
+    const random = phonebook.length > 0 ? Math.round(Math.random() * (1000000 - 1)) : 0;
+    return String(random);
+}
+
+app.post("/api/persons", (request, response) => {
+    const body = request.body;
+
+    if (!body.name) {
+        return response.status(400).json({
+            error: "Name is missing from the body content..."
+        });
+    };
+
+    if (!body.number) {
+        return response.status(400).json({
+            error: "Number is missing from the body content..."
+        });
+    };
+
+    const entry = {
+        name: body.name,
+        number: body.number,
+        favorite: Boolean(body.favorite) || false,
+        id: generateId()
+    };
+
+    phonebook = phonebook.concat(entry);
+    console.log(entry);
+    response.json(entry);
+});
 
 
 

@@ -5,3 +5,12 @@ GET http://localhost:3001/api/persons/5
 
 ###
 DELETE http://localhost:3001/api/persons/4
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Fart Priest 69",
+    "number": "(696) 969-6969"
+}
