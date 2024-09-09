@@ -83,6 +83,30 @@ app.post("/api/persons", (request, response) => {
         });
     };
 
+    const foundName = phonebook.find((entry) => entry.name === body.name);
+    const foundNumber = phonebook.find((entry) => entry.number === body.number);
+
+
+    if (foundName && foundNumber) {
+        return response.status(400).json({
+            error: "Name and number both already exist in the phonebook. Use different variables."
+        });
+    };
+    
+    if (foundName) {
+        return response.status(400).json({
+            error: "Name already exists in the phonebook. Use another name."
+        });
+    };
+
+    if (foundNumber) {
+        return response.status(400).json({
+            error: "Number already exists in the phonebook. Use another number."
+        });
+    };
+
+
+
     const entry = {
         name: body.name,
         number: body.number,
