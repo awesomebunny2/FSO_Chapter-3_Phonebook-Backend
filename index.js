@@ -38,6 +38,13 @@ app.get("/api/persons", (request, response) => {
     response.json(phonebook);
 });
 
+app.get("/info", (request, response) => {
+    const length = `Phonebook has info for ${phonebook.length} people.`;
+    const time = new Date();
+
+    response.send(`<p>${length}<br/><br/>${time}.</p>`);
+});
+
 
 
 
