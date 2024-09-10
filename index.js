@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 
 app.use(express.json());
 
@@ -29,6 +30,8 @@ let phonebook = [
         "favorite": false
     },
 ];
+
+app.use(morgan("tiny"));
 
 app.get("/", (request, response) => {
     response.send("<h1>Hello World!</h1>");
@@ -92,7 +95,7 @@ app.post("/api/persons", (request, response) => {
             error: "Name and number both already exist in the phonebook. Use different variables."
         });
     };
-    
+
     if (foundName) {
         return response.status(400).json({
             error: "Name already exists in the phonebook. Use another name."
