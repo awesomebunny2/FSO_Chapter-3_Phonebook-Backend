@@ -31,7 +31,20 @@ let phonebook = [
     },
 ];
 
-app.use(morgan("tiny"));
+
+morgan.token('post-data', (req, res) => { 
+    if (req.method === "POST") {
+        return JSON.stringify(req.body);
+    };
+    return " ";
+});
+
+// app.use(morgan("tiny"));
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :post-data"));
+
+
+// app.use(morgan(':type'));
+
 
 app.get("/", (request, response) => {
     response.send("<h1>Hello World!</h1>");
@@ -118,7 +131,6 @@ app.post("/api/persons", (request, response) => {
     };
 
     phonebook = phonebook.concat(entry);
-    console.log(entry);
     response.json(entry);
 });
 
