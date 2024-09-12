@@ -43,12 +43,7 @@ morgan.token('post-data', (req, res) => {
     return " ";
 });
 
-// app.use(morgan("tiny"));
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :post-data"));
-
-
-// app.use(morgan(':type'));
-
 
 app.get("/", (request, response) => {
     response.send("<h1>Hello World!</h1>");
