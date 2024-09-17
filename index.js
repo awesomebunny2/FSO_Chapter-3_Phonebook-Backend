@@ -1,12 +1,15 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
 
 app.use(cors());
-
 app.use(express.json());
 app.use(express.static("dist"));
+
+const Entry = require("./models/entry");
+
 
 let phonebook = [
     {
@@ -50,7 +53,9 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-    response.json(phonebook);
+    Entry.find({}).then(entries => {
+        response.json(entries);
+    });
 });
 
 app.get("/info", (request, response) => {
@@ -61,15 +66,20 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons/:id", (request, response) => {
-    const id = request.params.id;
-    const person = phonebook.find(entry => entry.id === id);
 
-    if (person) {
-        response.json(person);
-    } else {
-        response.statusMessage = `The person id of ${id} does not currently exist in the phonebook...`;
-        response.status(404).end();
-    };
+    Entry.findById(request.params.id).then(entry => {
+        response.json(entry);
+    });
+
+    // const id = request.params.id;
+    // const person = phonebook.find(entry => entry.id === id);
+
+    // if (person) {
+    //     response.json(person);
+    // } else {
+    //     response.statusMessage = `The person id of ${id} does not currently exist in the phonebook...`;
+    //     response.status(404).end();
+    // };
 });
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -122,15 +132,19 @@ app.post("/api/persons", (request, response) => {
 
 
 
-    const entry = {
+    const entry = new Entry({
         name: body.name,
         number: body.number,
         favorite: Boolean(body.favorite) || false,
         id: generateId()
-    };
+    });
 
-    phonebook = phonebook.concat(entry);
-    response.json(entry);
+    entry.save().then(savedEntry => {
+        response.json(savedEntry);
+    });
+
+    // phonebook = phonebook.concat(entry);
+    // response.json(entry);
 });
 
 
