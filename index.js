@@ -5,8 +5,8 @@ const morgan = require("morgan");
 const cors = require("cors");
 
 app.use(cors());
-app.use(express.json());
 app.use(express.static("dist"));
+app.use(express.json());
 
 const Entry = require("./models/entry");
 
@@ -39,6 +39,8 @@ let phonebook = [
 ];
 
 
+
+
 morgan.token('post-data', (req, res) => { 
     if (req.method === "POST") {
         return JSON.stringify(req.body);
@@ -65,11 +67,15 @@ app.get("/info", (request, response) => {
     response.send(`<p>${length}<br/><br/>${time}.</p>`);
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
 
     Entry.findById(request.params.id).then(entry => {
-        response.json(entry);
-    });
+        if (entry) {
+            response.json(entry);
+        } else {
+            response.status(404).end();
+        };
+    }).catch(error => next(error));
 
     // const id = request.params.id;
     // const person = phonebook.find(entry => entry.id === id);
@@ -82,7 +88,7 @@ app.get("/api/persons/:id", (request, response) => {
     // };
 });
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
     // const id = request.params.id;
     // phonebook = phonebook.filter(entry => entry.id !== id);
     // response.status(204).end();
@@ -150,6 +156,25 @@ app.post("/api/persons", (request, response) => {
     // phonebook = phonebook.concat(entry);
     // response.json(entry);
 });
+
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({error: "Unknown Endpoint..."});
+};
+
+app.use(unknownEndpoint);
+
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message);
+
+    if (error.name === "CastError") {
+        return response.status(400).send({error: "Malformatted id"});
+    };
+    next(error);
+};
+
+app.use(errorHandler);
 
 
 
