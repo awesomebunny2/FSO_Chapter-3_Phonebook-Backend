@@ -11,32 +11,32 @@ app.use(express.json());
 const Entry = require("./models/entry");
 
 
-let phonebook = [
-    {
-        "id": "1",
-        "name": "Mario Mario",
-        "number": "(843) 727-8954",
-        "favorite": true
-    },
-    {
-        "id": "2",
-        "name": "Hazel-Rah",
-        "number": "(464) 919-7737",
-        "favorite": false
-    },
-    {
-        "id": "3",
-        "name": "Jason Funderburker",
-        "number": "(919) 747-2179",
-        "favorite": false
-    },
-    {
-        "id": "4",
-        "name": "Link Link",
-        "number": "(222) 222-2222",
-        "favorite": false
-    },
-];
+// let phonebook = [
+//     {
+//         "id": "1",
+//         "name": "Mario Mario",
+//         "number": "(843) 727-8954",
+//         "favorite": true
+//     },
+//     {
+//         "id": "2",
+//         "name": "Hazel-Rah",
+//         "number": "(464) 919-7737",
+//         "favorite": false
+//     },
+//     {
+//         "id": "3",
+//         "name": "Jason Funderburker",
+//         "number": "(919) 747-2179",
+//         "favorite": false
+//     },
+//     {
+//         "id": "4",
+//         "name": "Link Link",
+//         "number": "(222) 222-2222",
+//         "favorite": false
+//     },
+// ];
 
 
 
@@ -60,11 +60,15 @@ app.get("/api/persons", (request, response) => {
     });
 });
 
-app.get("/info", (request, response) => {
-    const length = `Phonebook has info for ${phonebook.length} people.`;
-    const time = new Date();
+app.get("/info", (request, response, next) => {
 
-    response.send(`<p>${length}<br/><br/>${time}.</p>`);
+    Entry.countDocuments({}).then(count => {
+        const length = `Phonebook has info for ${count} people.`;
+        const time = new Date();
+    
+        response.send(`<p>${length}<br/><br/>${time}.</p>`);
+    }).catch(error => next(error));
+
 });
 
 app.get("/api/persons/:id", (request, response, next) => {
@@ -103,7 +107,22 @@ const generateId = () => {
     return String(random);
 }
 
-app.post("/api/persons", (request, response) => {
+
+app.put("/api/persons/:id", (request, response, next) => {
+    const body = request.body;
+
+    const entry = {
+        name: body.name,
+        number: body.number,
+        favorite: body.favorite
+    };
+
+    Entry.findByIdAndUpdate(request.params.id, entry, {new: true}).then(updatedEntry => {
+        response.json(updatedEntry);
+    }).catch(error => next(error));
+});
+
+app.post("/api/persons", async (request, response) => {
     const body = request.body;
 
     if (!body.name) {
@@ -118,40 +137,83 @@ app.post("/api/persons", (request, response) => {
         });
     };
 
-    const foundName = phonebook.find((entry) => entry.name === body.name);
-    const foundNumber = phonebook.find((entry) => entry.number === body.number);
+    try {
+        const foundName = await Entry.findOne({name: body.name});
+        const foundNumber = await Entry.findOne({number: body.number});
 
-
-    if (foundName && foundNumber) {
-        return response.status(400).json({
-            error: "Name and number both already exist in the phonebook. Use different variables."
+        if (foundName && foundNumber) {
+            return response.status(400).json({
+                error: "Name and number both already exist in the phonebook. Use different variables."
+            });
+        };
+    
+        if (foundName) {
+            return response.status(400).json({
+                error: "Name already exists in the phonebook. Use another name."
+            });
+        };
+    
+        if (foundNumber) {
+            return response.status(400).json({
+                error: "Number already exists in the phonebook. Use another number."
+            });
+        };
+    
+    
+    
+        const entry = new Entry({
+            name: body.name,
+            number: body.number,
+            favorite: Boolean(body.favorite) || false,
+            // id: generateId()
         });
-    };
+    
+        // entry.save().then(savedEntry => {
+        //     response.json(savedEntry);
+        // });
 
-    if (foundName) {
-        return response.status(400).json({
-            error: "Name already exists in the phonebook. Use another name."
-        });
-    };
-
-    if (foundNumber) {
-        return response.status(400).json({
-            error: "Number already exists in the phonebook. Use another number."
-        });
-    };
-
-
-
-    const entry = new Entry({
-        name: body.name,
-        number: body.number,
-        favorite: Boolean(body.favorite) || false,
-        id: generateId()
-    });
-
-    entry.save().then(savedEntry => {
+        const savedEntry = await entry.save();
         response.json(savedEntry);
-    });
+
+    } catch (error) {
+        console.log("Error saving entry: ", error);
+        response.status(500).json({error: "An error occured while trying to save the contact"});
+    };
+
+    // const foundName = phonebook.find((entry) => entry.name === body.name);
+    // const foundNumber = phonebook.find((entry) => entry.number === body.number);
+
+
+    // if (foundName && foundNumber) {
+    //     return response.status(400).json({
+    //         error: "Name and number both already exist in the phonebook. Use different variables."
+    //     });
+    // };
+
+    // if (foundName) {
+    //     return response.status(400).json({
+    //         error: "Name already exists in the phonebook. Use another name."
+    //     });
+    // };
+
+    // if (foundNumber) {
+    //     return response.status(400).json({
+    //         error: "Number already exists in the phonebook. Use another number."
+    //     });
+    // };
+
+
+
+    // const entry = new Entry({
+    //     name: body.name,
+    //     number: body.number,
+    //     favorite: Boolean(body.favorite) || false,
+    //     id: generateId()
+    // });
+
+    // entry.save().then(savedEntry => {
+    //     response.json(savedEntry);
+    // });
 
     // phonebook = phonebook.concat(entry);
     // response.json(entry);

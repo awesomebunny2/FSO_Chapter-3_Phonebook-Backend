@@ -14,6 +14,20 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-    "name": "Fart Priest 69",
-    "number": "(696) 969-6969"
+    "name": "Fart Man",
+    "number": "(200) 222-2020"
 }
+
+###
+PUT http://localhost:3001/api/persons/66e86816b442c73b3344655b
+Content-Type: application/json
+
+{
+    "name": "Mr. Cheese",
+    "number": "1234567890",
+    "favorite": true
+}
+
+###
+
+GET http://localhost:3001/info
