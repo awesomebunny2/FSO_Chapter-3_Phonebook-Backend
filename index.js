@@ -109,20 +109,24 @@ const generateId = () => {
 
 
 app.put("/api/persons/:id", (request, response, next) => {
-    const body = request.body;
+    const {name, number, favorite} = request.body;
 
-    const entry = {
-        name: body.name,
-        number: body.number,
-        favorite: body.favorite
-    };
+    // const entry = {
+    //     name: body.name,
+    //     number: body.number,
+    //     favorite: body.favorite
+    // };
 
-    Entry.findByIdAndUpdate(request.params.id, entry, {new: true}).then(updatedEntry => {
+    Entry.findByIdAndUpdate(
+        request.params.id, 
+        {name, number, favorite}, 
+        {new: true, runValidators: true, context: "query"}
+    ).then(updatedEntry => {
         response.json(updatedEntry);
     }).catch(error => next(error));
 });
 
-app.post("/api/persons", async (request, response) => {
+app.post("/api/persons", async (request, response, next) => {
     const body = request.body;
 
     if (!body.name) {
@@ -172,8 +176,15 @@ app.post("/api/persons", async (request, response) => {
         //     response.json(savedEntry);
         // });
 
-        const savedEntry = await entry.save();
-        response.json(savedEntry);
+        try {
+            const savedEntry = await entry.save();
+            response.json(savedEntry);
+        } catch (error) {
+            next(error);
+        };
+
+        // const savedEntry = await entry.save();
+        // response.json(savedEntry);
 
     } catch (error) {
         console.log("Error saving entry: ", error);
