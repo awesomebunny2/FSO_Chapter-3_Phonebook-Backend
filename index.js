@@ -41,7 +41,7 @@ const Entry = require("./models/entry");
 
 
 
-morgan.token('post-data', (req, res) => { 
+morgan.token("post-data", (req, _res) => {
     if (req.method === "POST") {
         return JSON.stringify(req.body);
     };
@@ -65,7 +65,7 @@ app.get("/info", (request, response, next) => {
     Entry.countDocuments({}).then(count => {
         const length = `Phonebook has info for ${count} people.`;
         const time = new Date();
-    
+
         response.send(`<p>${length}<br/><br/>${time}.</p>`);
     }).catch(error => next(error));
 
@@ -97,19 +97,19 @@ app.delete("/api/persons/:id", (request, response, next) => {
     // phonebook = phonebook.filter(entry => entry.id !== id);
     // response.status(204).end();
 
-    Entry.findByIdAndDelete(request.params.id).then(result => {
+    Entry.findByIdAndDelete(request.params.id).then(_result => {
         response.status(204).end();
     }).catch(error => next(error));
 });
 
-const generateId = () => {
-    const random = phonebook.length > 0 ? Math.round(Math.random() * (1000000 - 1)) : 0;
-    return String(random);
-};
+// const generateId = () => {
+//     const random = phonebook.length > 0 ? Math.round(Math.random() * (1000000 - 1)) : 0;
+//     return String(random);
+// };
 
 
 app.put("/api/persons/:id", (request, response, next) => {
-    const {name, number, favorite} = request.body;
+    const { name, number, favorite } = request.body;
 
     // const entry = {
     //     name: body.name,
@@ -118,9 +118,9 @@ app.put("/api/persons/:id", (request, response, next) => {
     // };
 
     Entry.findByIdAndUpdate(
-        request.params.id, 
-        {name, number, favorite}, 
-        {new: true, runValidators: true, context: "query"}
+        request.params.id,
+        { name, number, favorite },
+        { new: true, runValidators: true, context: "query" }
     ).then(updatedEntry => {
         response.json(updatedEntry);
     }).catch(error => next(error));
@@ -142,36 +142,36 @@ app.post("/api/persons", async (request, response, next) => {
     };
 
     try {
-        const foundName = await Entry.findOne({name: body.name});
-        const foundNumber = await Entry.findOne({number: body.number});
+        const foundName = await Entry.findOne({ name: body.name });
+        const foundNumber = await Entry.findOne({ number: body.number });
 
         if (foundName && foundNumber) {
             return response.status(400).json({
                 error: "Name and number both already exist in the phonebook. Use different variables."
             });
         };
-    
+
         if (foundName) {
             return response.status(400).json({
                 error: "Name already exists in the phonebook. Use another name."
             });
         };
-    
+
         if (foundNumber) {
             return response.status(400).json({
                 error: "Number already exists in the phonebook. Use another number."
             });
         };
-    
-    
-    
+
+
+
         const entry = new Entry({
             name: body.name,
             number: body.number,
             favorite: Boolean(body.favorite) || false,
             // id: generateId()
         });
-    
+
         // entry.save().then(savedEntry => {
         //     response.json(savedEntry);
         // });
@@ -188,7 +188,7 @@ app.post("/api/persons", async (request, response, next) => {
 
     } catch (error) {
         console.log("Error saving entry: ", error);
-        response.status(500).json({error: "An error occured while trying to save the contact"});
+        response.status(500).json({ error: "An error occured while trying to save the contact" });
     };
 
     // const foundName = phonebook.find((entry) => entry.name === body.name);
@@ -232,7 +232,7 @@ app.post("/api/persons", async (request, response, next) => {
 
 
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({error: "Unknown Endpoint..."});
+    response.status(404).send({ error: "Unknown Endpoint..." });
 };
 
 app.use(unknownEndpoint);
@@ -242,9 +242,9 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message);
 
     if (error.name === "CastError") {
-        return response.status(400).send({error: "Malformatted id"});
+        return response.status(400).send({ error: "Malformatted id" });
     } else if (error.name === "ValidationError") {
-        return response.status(400).json({error: error.message});
+        return response.status(400).json({ error: error.message });
     };
 
     next(error);

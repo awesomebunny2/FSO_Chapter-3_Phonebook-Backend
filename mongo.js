@@ -15,12 +15,12 @@ mongoose.set("strictQuery", false);
 mongoose.connect(url);
 
 const entrySchema = new mongoose.Schema({
-  name: String,
-  number: String,
-  favorite: Boolean,
+    name: String,
+    number: String,
+    favorite: Boolean,
 });
 
-const Entry = mongoose.model('Entry', entrySchema);
+const Entry = mongoose.model("Entry", entrySchema);
 
 if (process.argv.length > 3) {
 
@@ -38,7 +38,7 @@ if (process.argv.length > 3) {
         favorite: favorite
     });
 
-    newEntry.save().then(result => {
+    newEntry.save().then(_result => {
         if (favorite) {
             console.log(`Added ${name}: ${number} as a favorite to the phonebook!`);
         } else {
