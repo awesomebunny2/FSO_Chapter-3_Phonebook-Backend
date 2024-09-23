@@ -105,7 +105,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
 const generateId = () => {
     const random = phonebook.length > 0 ? Math.round(Math.random() * (1000000 - 1)) : 0;
     return String(random);
-}
+};
 
 
 app.put("/api/persons/:id", (request, response, next) => {
